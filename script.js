@@ -116,4 +116,5 @@ function removeItemCart (name){
         cart.splice(index, 1);
         updateCartModal();
     }
+    // comentando
 }
