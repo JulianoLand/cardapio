@@ -10,6 +10,7 @@ const addressInput = document.getElementById("address")
 const addressWarn = document.getElementById("address-warn")
 
 let cart = [];
+addressInput.value = "";
 
 // Abrindo modal do carrinho
 cartBtn.addEventListener("click",()=>{
@@ -115,6 +116,72 @@ function removeItemCart (name){
 
         cart.splice(index, 1);
         updateCartModal();
+    }   
+}
+
+addressInput.addEventListener("input",(event)=>{
+    let inputValue = event.target.value;
+    if(inputValue !== ""){
+        addressInput.classList.remove("border-red-500")
+        addressWarn.classList.add("hidden")
     }
-    // comentando
+})
+
+checkoutBtn.addEventListener("click",()=>{
+    const isOpen = CheckRestauranteOpen();
+    if(!isOpen){
+        
+        Toastify({
+            text: "Ops! Restaurante fechado!",
+            duration: 3000,
+            close: true,
+            gravity: "top", // `top` or `bottom`
+            position: "right", // `left`, `center` or `right`
+            stopOnFocus: true, // Prevents dismissing of toast on hover
+            style: {
+              background: "#ef4444",
+            },
+          }).showToast();
+
+        return;
+    }
+
+    if(cart.length === 0) return;
+    if(addressInput.value === ""){
+        addressWarn.classList.remove("hidden")
+        addressInput.classList.add("border-red-500")
+        return;
+    }
+
+    const cartItem = cart.map((item)=>{
+        return (
+            `${item.name} Qtd: ${item.quantity} Preço: R$${item.price}`
+        )
+    }).join("");
+
+    const message = encodeURIComponent(cartItem);
+    const phone = "61993393427";
+
+    window.open(`https://wa.me/55${phone}?text=${message} Endereço: ${addressInput.value}`, "_blank");
+
+    cart = [];
+    updateCartModal();
+    addressInput.value = "";
+})
+
+function CheckRestauranteOpen(){
+    const data = new Date();
+    const hora = data.getHours();
+    return hora >= 18 && hora < 22;
+}
+
+const spanItem = document.getElementById("date-span")
+const isOpen = CheckRestauranteOpen();
+
+if (isOpen){
+    spanItem.classList.remove("bg-red-500")
+    spanItem.classList.add("bg-green-600")
+}else{
+    spanItem.classList.add("bg-red-500")
+    spanItem.classList.remove("bg-green-600")
 }
